@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-yaml
 PKG_VERSION:=5.1.2
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=PyYAML-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://files.pythonhosted.org/packages/source/P/PyYAML
@@ -22,11 +22,15 @@ PKG_CPE_ID:=cpe:/a:pyyaml_project:pyyaml
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(BUILD_VARIANT)-PyYAML-$(PKG_VERSION)
 
+HOST_BUILD_DEPENDS:=python3/host
+
+include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 include ../python-package.mk
 include ../python3-package.mk
 
 PKG_UNPACK=$(HOST_TAR) -C $(PKG_BUILD_DIR) --strip-components=1 -xzf $(DL_DIR)/$(PKG_SOURCE)
+HOST_UNPACK:=$(HOST_TAR) -C $(HOST_BUILD_DIR) --strip-components=1 -xzf $(DL_DIR)/$(PKG_SOURCE)
 
 define Package/python-yaml/Default
   SECTION:=lang
@@ -63,6 +67,14 @@ endef
 
 PYTHON_PKG_SETUP_GLOBAL_ARGS:=--with-libyaml
 PYTHON_PKG_SETUP_ARGS:=
+define Host/Compile
+		$(call Build/Compile/HostPy3Mod,,install --prefix="" --root="$(STAGING_DIR_HOSTPKG)")
+endef
+
+Host/Install:=
+
+$(eval $(call HostBuild))
+
 PYTHON3_PKG_SETUP_GLOBAL_ARGS:=--with-libyaml
 PYTHON3_PKG_SETUP_ARGS:=
 
